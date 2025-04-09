@@ -46,3 +46,6 @@ def cards_study_view(request):
 
 def stats_view(request):
     return render(request, 'stats.html')
+
+def create_card_set(request):
+    return redirect('home')

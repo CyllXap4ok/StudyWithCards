@@ -28,4 +28,5 @@ urlpatterns = [
     path('cards_study/', views.cards_study_view, name='cards_study'),
     path('stats/', views.stats_view, name='stats'),
     path('logout/', LogoutView.as_view(), name='logout'),
+    path('create_card_set', views.create_card_set, name='create_card_set')
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,10 +1,373 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base_page.html' %}
 
-</body>
-</html>
+{% load static %}
+
+{% block content %}
+<div class="header">
+    <div class="site-title">Study With Cards</div>
+
+    <div class="user-container" id="userDropdown">
+        <div class="user-info">
+            <div>{{ user.name }}</div>
+            <div style="font-size: 0.8em;">{{ user.email }}</div>
+        </div>
+
+        <div class="user-icon" style="background-image: url(
+            {% if user.avatar %}
+                {{ user.avatar.url }}
+            {% else %}
+                {% static 'images/user-icon.png' %}
+            {% endif %});">
+        </div>
+
+        <div class="dropdown-menu" id="dropdownMenu">
+            <a href="{% url 'stats' %}" class="dropdown-item">Статистика</a>
+            <a href="#" class="dropdown-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Выход</a>
+            <form id="logout-form" method="post" action="{% url 'logout' %}" style="display: none;">
+                {% csrf_token %}
+            </form>
+        </div>
+    </div>
+</div>
+<div class="divider"></div>
+
+<div class="container">
+    <div class="cards-container" id="cardsContainer">
+        <!-- СПИСОК КАРТОЧЕК -->
+    </div>
+
+    <div class="add-card-container">
+        <button class="add-card-btn" id="addCardBtn"></button>
+    </div>
+
+    <button class="save-set-btn" id="saveSetBtn">СОХРАНИТЬ НАБОР</button>
+</div>
+
+<form id="cardSetForm" method="post" action="{% url 'create_card_set' %}" style="display: none;">
+    {% csrf_token %}
+    <input type="hidden" name="card_set_name" id="cardSetNameInput">
+    <div id="cardsDataContainer"></div>
+</form>
+
+<style>
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+    }
+
+    .site-title {
+        color: white;
+        font-size: 32px;
+        font-weight: bold;
+    }
+
+    .user-container {
+        display: flex;
+        align-items: center;
+        position: relative;
+        cursor: pointer;
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        margin: 5px;
+        background-color: rgba(255, 255, 255, 0.5);
+        border: 1px solid white;
+        border-radius: 5px;
+        padding: 10px 0;
+        min-width: 150px;
+        display: none;
+        z-index: 1000;
+    }
+
+    .dropdown-menu.show {
+        display: block;
+    }
+
+    .dropdown-item {
+        color: black;
+        padding: 8px 15px;
+        text-decoration: none;
+        display: block;
+    }
+
+    .dropdown-item:hover {
+        background-color: white;
+    }
+
+    .user-info {
+        color: white;
+        text-align: right;
+        margin-right: 20px;
+    }
+
+    .user-icon {
+        width: 50px;
+        height: 50px;
+        border: 1px solid white;
+        border-radius: 50%;
+        background-size: cover;
+        background-position: center;
+    }
+
+    .divider {
+        border-top: 2px solid white;
+    }
+
+    .container {
+        padding: 10px 20px;
+        max-width: 800px;
+        margin: 0 auto;
+        min-height: calc(100vh - 150px);
+        padding-bottom: 20px;
+    }
+
+    .cards-container {
+        margin-bottom: 20px;
+        padding: 10px;
+    }
+
+    .card {
+        position: relative;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 15px;
+        margin-bottom: 15px;
+        display: flex;
+        transition: all 0.3s ease;
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeIn 0.3s forwards;
+        height: 100px;
+    }
+
+    @keyframes fadeIn {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .card-divider {
+        border-left: 1px solid #ccc;
+        margin: 0 15px;
+        height: 100%;
+        align-self: center;
+    }
+
+    .card-side {
+        flex: 1;
+        padding: 5px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .side-title {
+        font-weight: bold;
+        margin-bottom: 10px;
+        text-align: left;
+        font-size: 16px;
+    }
+
+    .card-input {
+        width: 100%;
+        border: none;
+        outline: none;
+        background: transparent;
+        font-size: 16px;
+        min-height: 80px;
+        resize: none;
+        flex-grow: 1;
+    }
+
+    .add-card-container {
+        display: flex;
+        justify-content: center;
+        margin: 15px 0;
+    }
+
+    .add-card-btn {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: white;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        transition: transform 0.2s;
+        padding: 0;
+    }
+
+    .add-card-btn::after {
+        content: "+";
+        font-size: 24px;
+        line-height: 1;
+    }
+
+    .add-card-btn:hover {
+        transform: scale(1.1);
+    }
+
+    .save-set-btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        background: linear-gradient(to right, #1a7b45, #6b1ed3);
+        color: white;
+        font-weight: bold;
+        font-size: 18px;
+        cursor: pointer;
+        opacity: 0.7;
+        transition: opacity 0.2s;
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+    }
+
+    .save-set-btn:hover {
+        opacity: 1;
+    }
+
+    .delete-card-btn {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background-color: rgba(255, 0, 0, 0.7);
+        border: none;
+        color: white;
+        font-size: 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.2s, background-color 0.2s;
+        z-index: 10;
+    }
+
+    .delete-card-btn:hover {
+        background-color: rgba(255, 0, 0, 1);
+    }
+
+    .delete-card-btn::after {
+        content: "×";
+        line-height: 1;
+    }
+
+    .card:hover .delete-card-btn {
+        opacity: 1;
+    }
+
+    @keyframes slideOut {
+        0% {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        100% {
+            transform: translateX(-100px);
+            opacity: 0;
+            height: 0;
+            margin-bottom: 0;
+            padding: 0;
+        }
+    }
+
+    .card-deleting {
+        animation: slideOut 0.3s forwards;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Добавляем первую карточку при загрузке
+        addCard();
+
+        // Обработчик для кнопки добавления карточки
+        document.getElementById('addCardBtn').addEventListener('click', addCard);
+
+        // Обработчик для кнопки сохранения набора
+        document.getElementById('saveSetBtn').addEventListener('click', saveCardSet);
+
+        // Обработчик для выпадающего меню пользователя
+        document.getElementById('userDropdown').addEventListener('click', function() {
+            document.getElementById('dropdownMenu').classList.toggle('show');
+        });
+
+        // Закрываем выпадающее меню при клике вне его
+        window.addEventListener('click', function(event) {
+            if (!event.target.matches('#userDropdown') && !event.target.closest('#userDropdown')) {
+                const dropdown = document.getElementById('dropdownMenu');
+                if (dropdown.classList.contains('show')) {
+                    dropdown.classList.remove('show');
+                }
+            }
+        });
+    });
+
+    function addCard() {
+        const container = document.getElementById('cardsContainer');
+        const cardCount = container.children.length;
+
+        const cardDiv = document.createElement('div');
+        cardDiv.className = 'card';
+        cardDiv.innerHTML = `
+            <div class="card-side">
+                <div class="side-title">ПЕРЕДНЯЯ СТОРОНА</div>
+                <textarea class="card-input" name="term_${cardCount}" placeholder="Введите термин"></textarea>
+                <div class="input-underline"></div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="card-side">
+                <div class="side-title">ЗАДНЯЯ СТОРОНА</div>
+                <textarea class="card-input" name="definition_${cardCount}" placeholder="Введите определение"></textarea>
+                <div class="input-underline"></div>
+            </div>
+            <button class="delete-card-btn" onclick="deleteCard(this)"></button>
+        `;
+
+        container.appendChild(cardDiv);
+
+        // Прокручиваем к новой карточке
+        setTimeout(() => {
+            cardDiv.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+    }
+
+    function deleteCard(button) {
+        const card = button.closest('.card');
+        card.classList.add('card-deleting');
+
+        // Удаляем карточку после завершения анимации
+        setTimeout(() => {
+            card.remove();
+            // Обновляем имена полей ввода для оставшихся карточек
+            updateCardInputNames();
+        }, 300);
+    }
+
+    function updateCardInputNames() {
+        const container = document.getElementById('cardsContainer');
+        const cards = container.querySelectorAll('.card');
+
+        cards.forEach((card, index) => {
+            const termInput = card.querySelector(`textarea[name^="term_"]`);
+            const definitionInput = card.querySelector(`textarea[name^="definition_"]`);
+
+            if (termInput) termInput.name = `term_${index}`;
+            if (definitionInput) definitionInput.name = `definition_${index}`;
+        });
+    }
+</script>
+
+{% endblock %}

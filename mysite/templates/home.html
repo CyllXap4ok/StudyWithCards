@@ -2,6 +2,49 @@
 {% load static %}
 
 {% block content %}
+<div class="header">
+    <div class="site-title">Study With Cards</div>
+
+    <div class="user-container" id="userDropdown">
+
+        <div class="user-info">
+            <div>{{ user.name }}</div>
+            <div style="font-size: 0.8em;">{{ user.email }}</div>
+        </div>
+
+        <div class="user-icon" style="background-image: url(
+            {% if user.avatar %}
+                {{ user.avatar.url }}
+            {% else %}
+                {% static 'images/user-icon.png' %}
+            {% endif %});">
+        </div>
+
+        <div class="dropdown-menu" id="dropdownMenu">
+            <a href="{% url 'stats' %}" class="dropdown-item">Статистика</a>
+            <a href="#" class="dropdown-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Выход</a>
+            <form id="logout-form" method="post" action="{% url 'logout' %}" style="display: none;">
+                {% csrf_token %}
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="sets-grid">
+    {% for set in user.cardset_set.all %}
+    <a href="{% url 'cards_study' set_id=set.id %}" style="text-decoration: none; color: inherit;">
+        <div class="set-card" style="background-color: {{ set.bg_color }};">
+            <h3>{{ set.name }}</h3>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+
+<a href="{% url 'cards_creation' %}" class="add-button"></a>
+
 <style>
     .header {
         display: flex;
@@ -101,68 +144,30 @@
         right: 50px;
         width: 60px;
         height: 60px;
-        border: 1px solid white;
-        border-radius: 15%;
+        border: none;
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        background: rgba(255, 255, 255, 0.1);
+        background: white;
         text-decoration: none;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        transition: transform 0.2s;
     }
 
     .add-button::before {
         content: '+';
-        color: white;
-        font-size: 44px;
+        color: black;
+        font-size: 24px;
         line-height: 1;
+    }
+
+    .add-button:hover {
+        transform: scale(1.1);
     }
 </style>
 
-<div class="header">
-    <div class="site-title">Study With Cards</div>
-
-    <div class="user-container" id="userDropdown">
-
-        <div class="user-info">
-            <div>{{ user.name }}</div>
-            <div style="font-size: 0.8em;">{{ user.email }}</div>
-        </div>
-
-        <div class="user-icon" style="background-image: url(
-            {% if user.avatar %}
-                {{ user.avatar.url }}
-            {% else %}
-                {% static 'images/user-icon.png' %}
-            {% endif %});">
-        </div>
-
-        <div class="dropdown-menu" id="dropdownMenu">
-            <a href="{% url 'stats' %}" class="dropdown-item">Статистика</a>
-            <a href="#" class="dropdown-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Выход</a>
-            <form id="logout-form" method="post" action="{% url 'logout' %}" style="display: none;">
-                {% csrf_token %}
-            </form>
-        </div>
-
-    </div>
-</div>
-
-<div class="divider"></div>
-
-<div class="sets-grid">
-    {% for set in user.cardset_set.all %}
-    <a href="{% url 'cards_study' set_id=set.id %}" style="text-decoration: none; color: inherit;">
-        <div class="set-card" style="background-color: {{ set.bg_color }};">
-            <h3>{{ set.name }}</h3>
-        </div>
-    </a>
-    {% endfor %}
-</div>
-
-<a href="{% url 'cards_creation' %}" class="add-button"></a>
-
-{% block scripts %}
 <script>
     document.getElementById('userDropdown').addEventListener('click', function() {
         document.getElementById('dropdownMenu').classList.toggle('show');
@@ -175,6 +180,5 @@
         }
     });
 </script>
-{% endblock %}
 
 {% endblock %}

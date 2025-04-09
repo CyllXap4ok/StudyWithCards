@@ -1,6 +1,43 @@
 {% extends "base_page.html" %}
 
-{% block extra_css %}
+{% block content %}
+<div class="login-container">
+    {% if form.errors %}
+    <div class="errorlist">
+        {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-fields">
+            <div class="input-group">
+                {{ form.username.label_tag }}
+                <div class="input-field">
+                    {{ form.username }}
+                </div>
+                {{ form.username.errors }}
+            </div>
+
+            <div class="input-group">
+                {{ form.password.label_tag }}
+                <div class="input-field">
+                    {{ form.password }}
+                </div>
+                {{ form.password.errors }}
+            </div>
+        </div>
+
+        <div class="form-footer">
+            <button type="submit" class="signin-btn">Sign In</button>
+            <p class="signup-link">Don't have an account? <a href="{% url 'sign_up' %}">Sign up</a></p>
+        </div>
+    </form>
+</div>
+
 <style>
     body {
         display: flex;
@@ -117,47 +154,7 @@
         margin: 5px 0 0;
     }
 </style>
-{% endblock %}
 
-{% block content %}
-<div class="login-container">
-    {% if form.errors %}
-    <div class="errorlist">
-        {% for error in form.non_field_errors %}
-            <p>{{ error }}</p>
-        {% endfor %}
-    </div>
-    {% endif %}
-
-    <form method="post">
-        {% csrf_token %}
-
-        <div class="form-fields">
-            <div class="input-group">
-                {{ form.username.label_tag }}
-                <div class="input-field">
-                    {{ form.username }}
-                </div>
-                {{ form.username.errors }}
-            </div>
-
-            <div class="input-group">
-                {{ form.password.label_tag }}
-                <div class="input-field">
-                    {{ form.password }}
-                </div>
-                {{ form.password.errors }}
-            </div>
-        </div>
-
-        <div class="form-footer">
-            <button type="submit" class="signin-btn">Sign In</button>
-            <p class="signup-link">Don't have an account? <a href="{% url 'sign_up' %}">Sign up</a></p>
-        </div>
-    </form>
-</div>
-
-{% block extra_js %}
 <script>
     document.querySelectorAll('.input-field input').forEach(input => {
         // Устанавливаем черную границу при наличии значения
@@ -176,5 +173,5 @@
         });
     });
 </script>
-{% endblock %}
+
 {% endblock %}
