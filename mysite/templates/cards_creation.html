@@ -43,6 +43,18 @@
     <button class="save-set-btn" id="saveSetBtn">СОХРАНИТЬ НАБОР</button>
 </div>
 
+<!-- Всплывающее окно для ввода названия набора карточек -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="name-input-modal">
+        <div class="modal-title">НАЗВАНИЕ НАБОРА</div>
+        <input type="text" class="modal-input" id="setNameInput" placeholder="введите название" autocomplete="off">
+        <div class="modal-buttons">
+            <button class="modal-btn cancel-btn" id="cancelSaveBtn">ОТМЕНА</button>
+            <button class="modal-btn save-btn" id="confirmSaveBtn">СОХРАНИТЬ</button>
+        </div>
+    </div>
+</div>
+
 <form id="cardSetForm" method="post" action="{% url 'create_card_set' %}" style="display: none;">
     {% csrf_token %}
     <input type="hidden" name="card_set_name" id="cardSetNameInput">
@@ -135,6 +147,7 @@
         position: relative;
         background: white;
         border-radius: 8px;
+        border: 2px solid transparent;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         padding: 15px;
         margin-bottom: 15px;
@@ -144,6 +157,10 @@
         transform: translateY(20px);
         animation: fadeIn 0.3s forwards;
         height: 100px;
+    }
+
+    .card.invalid {
+        border-color: #ff4444;
     }
 
     @keyframes fadeIn {
@@ -286,6 +303,97 @@
     .card-deleting {
         animation: slideOut 0.3s forwards;
     }
+
+    /* Стили для всплывающего окна для ввода названия набора карточек */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.show {
+        display: flex;
+        opacity: 1;
+    }
+
+    .name-input-modal {
+        background-color: white;
+        border-radius: 10px;
+        padding: 25px;
+        width: 400px;
+        max-width: 90%;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        transform: translateY(-20px);
+        transition: transform 0.3s ease;
+    }
+
+    .modal-overlay.show .name-input-modal {
+        transform: translateY(0);
+    }
+
+    .modal-title {
+        font-weight: bold;
+        font-size: 18px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .modal-input {
+        width: 100%;
+        border: none;
+        border-bottom: 1px solid #ccc;
+        padding: 8px 0;
+        font-size: 16px;
+        margin-bottom: 25px;
+        outline: none;
+    }
+
+    .modal-input::placeholder {
+        color: #999;
+    }
+
+    .modal-buttons {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .modal-btn {
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-weight: bold;
+        cursor: pointer;
+        border: none;
+        font-size: 14px;
+        transition: background-color 0.2s;
+    }
+
+    .cancel-btn {
+        background-color: #f1f1f1;
+        color: #333;
+    }
+
+    .cancel-btn:hover {
+        background-color: #e0e0e0;
+    }
+
+    .save-btn {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    .save-btn:hover {
+        background-color: #3e8e41;
+    }
+
 </style>
 
 <script>
@@ -297,23 +405,50 @@
         document.getElementById('addCardBtn').addEventListener('click', addCard);
 
         // Обработчик для кнопки сохранения набора
-        document.getElementById('saveSetBtn').addEventListener('click', saveCardSet);
+        document.getElementById('saveSetBtn').addEventListener('click', showSaveModal);
+
+        // Обработчик для кнопки отмены в всплывающем окне для ввода названия набора карточек
+        document.getElementById('cancelSaveBtn').addEventListener('click', hideSaveModal);
+
+        // Обработчик для кнопки сохранения в всплывающем окне для ввода названия набора карточек
+        document.getElementById('confirmSaveBtn').addEventListener('click', saveCardSet);
 
         // Обработчик для выпадающего меню пользователя
         document.getElementById('userDropdown').addEventListener('click', function() {
             document.getElementById('dropdownMenu').classList.toggle('show');
         });
 
-        // Закрываем выпадающее меню при клике вне его
         window.addEventListener('click', function(event) {
+            // Закрываем выпадающее меню при клике вне его
             if (!event.target.matches('#userDropdown') && !event.target.closest('#userDropdown')) {
                 const dropdown = document.getElementById('dropdownMenu');
                 if (dropdown.classList.contains('show')) {
                     dropdown.classList.remove('show');
                 }
             }
+
+            // Закрываем всплывающее окно при клике вне его
+            if (event.target.matches('.modal-overlay')) {
+                hideSaveModal();
+            }
         });
     });
+
+    function showSaveModal() {
+        // Проверяем карточки перед показом модального окна
+        if (!validateCards()) {
+            return;
+        }
+
+        const modal = document.getElementById('modalOverlay');
+        modal.classList.add('show');
+        document.getElementById('setNameInput').focus();
+    }
+
+    function hideSaveModal() {
+        const modal = document.getElementById('modalOverlay');
+        modal.classList.remove('show');
+    }
 
     function addCard() {
         const container = document.getElementById('cardsContainer');
@@ -338,6 +473,14 @@
 
         container.appendChild(cardDiv);
 
+        // Обработчики для снятия выделения при вводе
+        const inputs = cardDiv.querySelectorAll('.card-input');
+        inputs.forEach(input => {
+            input.addEventListener('input', function() {
+                this.closest('.card').classList.remove('invalid');
+            });
+        });
+
         // Прокручиваем к новой карточке
         setTimeout(() => {
             cardDiv.scrollIntoView({ behavior: 'smooth' });
@@ -356,6 +499,7 @@
         }, 300);
     }
 
+    // Обновление списка после удаления карточки
     function updateCardInputNames() {
         const container = document.getElementById('cardsContainer');
         const cards = container.querySelectorAll('.card');
@@ -367,6 +511,105 @@
             if (termInput) termInput.name = `term_${index}`;
             if (definitionInput) definitionInput.name = `definition_${index}`;
         });
+    }
+
+    // Проверка карточек на заполненность
+    function validateCards() {
+        const container = document.getElementById('cardsContainer');
+        const cards = container.querySelectorAll('.card');
+        let isValid = true;
+
+        // Сначала убираем все подсветки
+        cards.forEach(card => {
+            card.classList.remove('invalid');
+        });
+
+        // Проверяем каждую карточку
+        cards.forEach(card => {
+            const termInput = card.querySelector('textarea[name^="term_"]');
+            const definitionInput = card.querySelector('textarea[name^="definition_"]');
+
+            const term = termInput.value.trim();
+            const definition = definitionInput.value.trim();
+
+            if (!term || !definition) {
+                card.classList.add('invalid');
+                isValid = false;
+            }
+        });
+
+        if (!isValid) {
+            alert('Заполните все поля карточек!');
+            return false;
+        }
+
+        // Проверяем, есть ли карточки
+        if (cards.length === 0) {
+            alert('Добавьте хотя бы одну карточку!');
+            return false;
+        }
+
+        return true;
+    }
+
+    // Сохранение всех карточек в набор и БД
+    function saveCardSet() {
+        const cardSetName = document.getElementById('setNameInput').value.trim();
+
+        if (!cardSetName) {
+            alert('Введите название набора!');
+            document.getElementById('setNameInput').focus();
+            return;
+        }
+
+        const container = document.getElementById('cardsContainer');
+        const cards = container.querySelectorAll('.card');
+
+        // Собираем данные карточек
+        const cardsData = [];
+
+        cards.forEach(card => {
+            const termInput = card.querySelector('textarea[name^="term_"]');
+            const definitionInput = card.querySelector('textarea[name^="definition_"]');
+
+            const term = termInput.value.trim();
+            const definition = definitionInput.value.trim();
+
+            cardsData.push({
+                term: term,
+                definition: definition
+            });
+        });
+
+        // Заполняем скрытую форму и отправляем
+        document.getElementById('cardSetNameInput').value = cardSetName;
+
+        const form = document.getElementById('cardSetForm');
+        // Очищаем старые данные
+        while (form.children.length > 2) {  // Оставляем только csrf и cardSetNameInput
+            form.removeChild(form.lastChild);
+        }
+
+        // Добавляем данные карточек напрямую в форму
+        cardsData.forEach((card, index) => {
+            const termInput = document.createElement('input');
+            termInput.type = 'hidden';
+            termInput.name = `term_${index}`;
+            termInput.value = card.term;
+            form.appendChild(termInput);
+
+            const definitionInput = document.createElement('input');
+            definitionInput.type = 'hidden';
+            definitionInput.name = `definition_${index}`;
+            definitionInput.value = card.definition;
+            form.appendChild(definitionInput);
+        });
+
+        // Скрываем модальное окно
+        hideSaveModal();
+
+        // Отправляем форму
+        form.submit();
     }
 </script>
 

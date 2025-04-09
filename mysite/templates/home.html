@@ -34,12 +34,11 @@
 <div class="divider"></div>
 
 <div class="sets-grid">
-    {% for set in user.cardset_set.all %}
-    <a href="{% url 'cards_study' set_id=set.id %}" style="text-decoration: none; color: inherit;">
-        <div class="set-card" style="background-color: {{ set.bg_color }};">
-            <h3>{{ set.name }}</h3>
+    {% for card_set in user.cardset_set.all %}
+        <div class="card-set" style="background-color: {{ card_set.bg_color }};">
+            <h3>{{ card_set.name }}</h3>
+            <p>Карточек: {{ card_set.card_set.count }}</p>
         </div>
-    </a>
     {% endfor %}
 </div>
 

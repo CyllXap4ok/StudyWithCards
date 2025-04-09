@@ -2,7 +2,10 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import render, redirect
+from django.views.decorators.http import require_POST
+from study_with_cards_app.models import CardSet, Card
 from .forms import UserSignInForm, UserSignUpForm
+import json
 
 @login_required(login_url='sign_in')
 def home_view(request):
@@ -47,5 +50,31 @@ def cards_study_view(request):
 def stats_view(request):
     return render(request, 'stats.html')
 
+
+@login_required
+@require_POST
 def create_card_set(request):
-    return redirect('home')
+    if request.method == 'POST':
+        card_set_name = request.POST.get('card_set_name', 'Новый набор')
+
+        card_set = CardSet.objects.create(
+            user=request.user,
+            name=card_set_name
+        )
+
+        # Получаем все поля, начинающиеся с 'term_' или 'definition_'
+        post_data = dict(request.POST)
+        terms = [v for k, v in post_data.items() if k.startswith('term_')]
+        definitions = [v for k, v in post_data.items() if k.startswith('definition_')]
+
+        # Создаем карточки, объединяя термины и определения
+        for term, definition in zip(terms, definitions):
+            Card.objects.create(
+                card_set=card_set,
+                term=term[0],  # Так как это список с одним элементом
+                definition=definition[0]
+            )
+
+        return redirect('home')
+
+    return redirect('cards_creation')
