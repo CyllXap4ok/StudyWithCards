@@ -37,11 +37,10 @@
     .user-icon {
         width: 100%;
         height: 100%;
-        border: 1px solid #000;
+        border: 2px solid #fff;
         border-radius: 50%;
         background-size: cover;
         background-position: center;
-        background-color: #f0f0f0;
     }
 
     .user-icon::after {
@@ -49,16 +48,18 @@
         position: absolute;
         bottom: 0px;
         right: 0px;
-        background: white;
-        width: 25px;
-        height: 25px;
+        background: linear-gradient(to bottom, #8ac3b5, #d74bff);
+        width: 24px;
+        height: 24px;
         border-radius: 50%;
-        border: 1px solid #000;
+        border: 1px solid #fff;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 14px;
+        color: white;
         transform: scaleX(-1);
+        line-height: 1;
     }
 
     #id_avatar {

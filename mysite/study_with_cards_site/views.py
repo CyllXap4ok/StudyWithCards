@@ -37,3 +37,12 @@ def signup_view(request):
         form = UserSignUpForm()
 
     return render(request, 'sign_up.html', {'form': form})
+
+def cards_creation_view(request):
+    return render(request, 'cards_creation.html')
+
+def cards_study_view(request):
+    return render(request, 'cards_study.html')
+
+def stats_view(request):
+    return render(request, 'stats.html')
