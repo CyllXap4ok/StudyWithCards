@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container">
     <div class="cards-container" id="cardsContainer">
-        <!-- СПИСОК КАРТОЧЕК -->
+        <!-- ТУТ РАСПОЛАГАЕТСЯ СПИСОК КАРТОЧЕК -->
     </div>
 
     <div class="add-card-container">
@@ -40,6 +40,245 @@
     <input type="hidden" name="card_set_name" id="cardSetNameInput">
     <div id="cardsDataContainer"></div>
 </form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Добавляем пустую карточку при загрузке страницы
+        addCard();
+
+        // Обработчики для кнопок
+        document.getElementById('addCardBtn').addEventListener('click', addCard);
+        document.getElementById('saveSetBtn').addEventListener('click', showSaveModal);
+        document.getElementById('cancelSaveBtn').addEventListener('click', hideSaveModal);
+        document.getElementById('confirmSaveBtn').addEventListener('click', saveCardSet);
+
+        // Обработчик для поля ввода названия набора
+        const nameInput = document.getElementById('setNameInput');
+        nameInput.addEventListener('input', function() {
+            document.querySelector('.modal-char-counter').textContent =
+                `${this.value.length}/50`;
+        });
+
+        // Обработчик окна, закрывающий его при нажатии вне окна
+        window.addEventListener('click', function(event) {
+            if (event.target.matches('.modal-overlay')) {
+                hideSaveModal();
+            }
+        });
+    });
+
+    function showSaveModal() {
+        // Проверяем карточки перед показом модального окна
+        if (!validateCards()) {
+            return;
+        }
+
+        const modal = document.getElementById('modalOverlay');
+        const nameInput = document.getElementById('setNameInput');
+        nameInput.value = '';
+        document.querySelector('.modal-char-counter').textContent = '0/50';
+        modal.classList.add('show');
+        nameInput.focus();
+    }
+
+    function hideSaveModal() {
+        const modal = document.getElementById('modalOverlay');
+        modal.classList.remove('show');
+    }
+
+    function addCard() {
+        const container = document.getElementById('cardsContainer');
+        const cardCount = container.children.length;
+
+        const cardDiv = document.createElement('div');
+        cardDiv.className = 'card';
+
+        // html код для карточки
+        cardDiv.innerHTML = `
+            <div class="card-side">
+                <div class="side-title-container">
+                    <div class="side-title">ПЕРЕДНЯЯ СТОРОНА</div>
+                    <div class="char-counter">0/50</div>
+                </div>
+                <textarea
+                    class="card-input"
+                    name="term_${cardCount}"
+                    placeholder="Поле для ввода"
+                    maxlength="50"
+                ></textarea>
+                <div class="input-underline"></div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="card-side">
+                <div class="side-title-container">
+                    <div class="side-title">ЗАДНЯЯ СТОРОНА</div>
+                    <div class="char-counter">0/150</div>
+                </div>
+                <textarea
+                    class="card-input"
+                    name="definition_${cardCount}"
+                    placeholder="Поле для ввода"
+                    maxlength="150"
+                ></textarea>
+                <div class="input-underline"></div>
+            </div>
+            <button class="delete-card-btn" onclick="deleteCard(this)"></button>
+        `;
+
+        container.appendChild(cardDiv);
+
+        // Обработчики для счетчика символов
+        const termInput = cardDiv.querySelector('textarea[name^="term_"]');
+        const termCounter = cardDiv.querySelector('.card-side:nth-child(1) .char-counter');
+
+        const defInput = cardDiv.querySelector('textarea[name^="definition_"]');
+        const defCounter = cardDiv.querySelector('.card-side:nth-child(3) .char-counter');
+
+        termInput.addEventListener('input', function() {
+            termCounter.textContent = `${this.value.length}/50`;
+            this.closest('.card').classList.remove('invalid');
+        });
+
+        defInput.addEventListener('input', function() {
+            defCounter.textContent = `${this.value.length}/150`;
+            this.closest('.card').classList.remove('invalid');
+        });
+
+        // Обработчики для снятия выделения при вводе
+        const inputs = cardDiv.querySelectorAll('.card-input');
+        inputs.forEach(input => {
+            input.addEventListener('input', function() {
+                this.closest('.card').classList.remove('invalid');
+            });
+        });
+
+        // Прокручиваем к новой карточке при её добавлении
+        setTimeout(() => {
+            cardDiv.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+    }
+
+    function deleteCard(button) {
+        const card = button.closest('.card');
+        card.classList.add('card-deleting');
+
+        setTimeout(() => {
+            card.remove();
+            updateCardInputNames();
+        }, 300);
+    }
+
+    // Обновление списка после удаления карточки
+    function updateCardInputNames() {
+        const container = document.getElementById('cardsContainer');
+        const cards = container.querySelectorAll('.card');
+
+        cards.forEach((card, index) => {
+            const termInput = card.querySelector(`textarea[name^="term_"]`);
+            const definitionInput = card.querySelector(`textarea[name^="definition_"]`);
+
+            if (termInput) termInput.name = `term_${index}`;
+            if (definitionInput) definitionInput.name = `definition_${index}`;
+        });
+    }
+
+    // Проверка карточек на заполненность
+    function validateCards() {
+        const container = document.getElementById('cardsContainer');
+        const cards = container.querySelectorAll('.card');
+        let isValid = true;
+
+        // Убираем все подсветки, чтобы установить их уже в случае ошибок
+        cards.forEach(card => {
+            card.classList.remove('invalid');
+        });
+
+        // Проверяем каждую карточку
+        cards.forEach(card => {
+            const termInput = card.querySelector('textarea[name^="term_"]');
+            const definitionInput = card.querySelector('textarea[name^="definition_"]');
+
+            const term = termInput.value.trim();
+            const definition = definitionInput.value.trim();
+
+            if (!term || !definition) {
+                card.classList.add('invalid');
+                isValid = false;
+            }
+        });
+
+        if (!isValid) {
+            alert('Заполните все поля карточек!');
+            return false;
+        }
+
+        // Проверяем, есть ли карточки
+        if (cards.length === 0) {
+            alert('Добавьте хотя бы одну карточку!');
+            return false;
+        }
+
+        return true;
+    }
+
+    // Сохранение всех карточек в набор и БД
+    function saveCardSet() {
+        const cardSetName = document.getElementById('setNameInput').value.trim();
+
+        if (!cardSetName) {
+            alert('Введите название набора!');
+            document.getElementById('setNameInput').focus();
+            return;
+        }
+
+        const container = document.getElementById('cardsContainer');
+        const cards = container.querySelectorAll('.card');
+
+        // Собираем данные карточек
+        const cardsData = [];
+
+        cards.forEach(card => {
+            const termInput = card.querySelector('textarea[name^="term_"]');
+            const definitionInput = card.querySelector('textarea[name^="definition_"]');
+
+            const term = termInput.value.trim();
+            const definition = definitionInput.value.trim();
+
+            cardsData.push({
+                term: term,
+                definition: definition
+            });
+        });
+
+        document.getElementById('cardSetNameInput').value = cardSetName;
+        const form = document.getElementById('cardSetForm');
+        // Очищаем старые данные
+        while (form.children.length > 2) {  // Оставляем только csrf и cardSetNameInput
+            form.removeChild(form.lastChild);
+        }
+
+        // Добавляем данные карточек в форму
+        cardsData.forEach((card, index) => {
+            const termInput = document.createElement('input');
+            termInput.type = 'hidden';
+            termInput.name = `term_${index}`;
+            termInput.value = card.term;
+            form.appendChild(termInput);
+
+            const definitionInput = document.createElement('input');
+            definitionInput.type = 'hidden';
+            definitionInput.name = `definition_${index}`;
+            definitionInput.value = card.definition;
+            form.appendChild(definitionInput);
+        });
+
+        // Скрываем всплывающее окно ввода названия набора
+        hideSaveModal();
+
+        // Отправляем форму
+        form.submit();
+    }
+</script>
 
 <style>
     .header {
@@ -400,252 +639,5 @@
     }
 
 </style>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Добавляем первую карточку при загрузке
-        addCard();
-
-        // Обработчик для кнопки добавления карточки
-        document.getElementById('addCardBtn').addEventListener('click', addCard);
-
-        // Обработчик для кнопки сохранения набора
-        document.getElementById('saveSetBtn').addEventListener('click', showSaveModal);
-
-        // Обработчик для кнопки отмены в всплывающем окне для ввода названия набора карточек
-        document.getElementById('cancelSaveBtn').addEventListener('click', hideSaveModal);
-
-        // Обработчик для кнопки сохранения в всплывающем окне для ввода названия набора карточек
-        document.getElementById('confirmSaveBtn').addEventListener('click', saveCardSet);
-
-        // Обработчик для поля ввода названия набора
-        const nameInput = document.getElementById('setNameInput');
-        nameInput.addEventListener('input', function() {
-            document.querySelector('.modal-char-counter').textContent =
-                `${this.value.length}/50`;
-        });
-
-        window.addEventListener('click', function(event) {
-            // Закрываем всплывающее окно при клике вне его
-            if (event.target.matches('.modal-overlay')) {
-                hideSaveModal();
-            }
-        });
-    });
-
-    function showSaveModal() {
-        // Проверяем карточки перед показом модального окна
-        if (!validateCards()) {
-            return;
-        }
-
-        const modal = document.getElementById('modalOverlay');
-        const nameInput = document.getElementById('setNameInput');
-        nameInput.value = '';
-        document.querySelector('.modal-char-counter').textContent = '0/50';
-        modal.classList.add('show');
-        nameInput.focus();
-    }
-
-    function hideSaveModal() {
-        const modal = document.getElementById('modalOverlay');
-        modal.classList.remove('show');
-    }
-
-    function addCard() {
-        const container = document.getElementById('cardsContainer');
-        const cardCount = container.children.length;
-
-        const cardDiv = document.createElement('div');
-        cardDiv.className = 'card';
-        cardDiv.innerHTML = `
-            <div class="card-side">
-                <div class="side-title-container">
-                    <div class="side-title">ПЕРЕДНЯЯ СТОРОНА</div>
-                    <div class="char-counter">0/50</div>
-                </div>
-                <textarea
-                    class="card-input"
-                    name="term_${cardCount}"
-                    placeholder="Поле для ввода"
-                    maxlength="50"
-                ></textarea>
-                <div class="input-underline"></div>
-            </div>
-            <div class="card-divider"></div>
-            <div class="card-side">
-                <div class="side-title-container">
-                    <div class="side-title">ЗАДНЯЯ СТОРОНА</div>
-                    <div class="char-counter">0/150</div>
-                </div>
-                <textarea
-                    class="card-input"
-                    name="definition_${cardCount}"
-                    placeholder="Поле для ввода"
-                    maxlength="150"
-                ></textarea>
-                <div class="input-underline"></div>
-            </div>
-            <button class="delete-card-btn" onclick="deleteCard(this)"></button>
-        `;
-
-        container.appendChild(cardDiv);
-
-        // Обработчики для счетчика символов
-        const termInput = cardDiv.querySelector('textarea[name^="term_"]');
-        const termCounter = cardDiv.querySelector('.card-side:nth-child(1) .char-counter');
-
-        const defInput = cardDiv.querySelector('textarea[name^="definition_"]');
-        const defCounter = cardDiv.querySelector('.card-side:nth-child(3) .char-counter');
-
-        termInput.addEventListener('input', function() {
-            termCounter.textContent = `${this.value.length}/50`;
-            this.closest('.card').classList.remove('invalid');
-        });
-
-        defInput.addEventListener('input', function() {
-            defCounter.textContent = `${this.value.length}/150`;
-            this.closest('.card').classList.remove('invalid');
-        });
-
-        // Обработчики для снятия выделения при вводе
-        const inputs = cardDiv.querySelectorAll('.card-input');
-        inputs.forEach(input => {
-            input.addEventListener('input', function() {
-                this.closest('.card').classList.remove('invalid');
-            });
-        });
-
-        // Прокручиваем к новой карточке
-        setTimeout(() => {
-            cardDiv.scrollIntoView({ behavior: 'smooth' });
-        }, 100);
-    }
-
-    function deleteCard(button) {
-        const card = button.closest('.card');
-        card.classList.add('card-deleting');
-
-        // Удаляем карточку после завершения анимации
-        setTimeout(() => {
-            card.remove();
-            // Обновляем имена полей ввода для оставшихся карточек
-            updateCardInputNames();
-        }, 300);
-    }
-
-    // Обновление списка после удаления карточки
-    function updateCardInputNames() {
-        const container = document.getElementById('cardsContainer');
-        const cards = container.querySelectorAll('.card');
-
-        cards.forEach((card, index) => {
-            const termInput = card.querySelector(`textarea[name^="term_"]`);
-            const definitionInput = card.querySelector(`textarea[name^="definition_"]`);
-
-            if (termInput) termInput.name = `term_${index}`;
-            if (definitionInput) definitionInput.name = `definition_${index}`;
-        });
-    }
-
-    // Проверка карточек на заполненность
-    function validateCards() {
-        const container = document.getElementById('cardsContainer');
-        const cards = container.querySelectorAll('.card');
-        let isValid = true;
-
-        // Сначала убираем все подсветки
-        cards.forEach(card => {
-            card.classList.remove('invalid');
-        });
-
-        // Проверяем каждую карточку
-        cards.forEach(card => {
-            const termInput = card.querySelector('textarea[name^="term_"]');
-            const definitionInput = card.querySelector('textarea[name^="definition_"]');
-
-            const term = termInput.value.trim();
-            const definition = definitionInput.value.trim();
-
-            if (!term || !definition) {
-                card.classList.add('invalid');
-                isValid = false;
-            }
-        });
-
-        if (!isValid) {
-            alert('Заполните все поля карточек!');
-            return false;
-        }
-
-        // Проверяем, есть ли карточки
-        if (cards.length === 0) {
-            alert('Добавьте хотя бы одну карточку!');
-            return false;
-        }
-
-        return true;
-    }
-
-    // Сохранение всех карточек в набор и БД
-    function saveCardSet() {
-        const cardSetName = document.getElementById('setNameInput').value.trim();
-
-        if (!cardSetName) {
-            alert('Введите название набора!');
-            document.getElementById('setNameInput').focus();
-            return;
-        }
-
-        const container = document.getElementById('cardsContainer');
-        const cards = container.querySelectorAll('.card');
-
-        // Собираем данные карточек
-        const cardsData = [];
-
-        cards.forEach(card => {
-            const termInput = card.querySelector('textarea[name^="term_"]');
-            const definitionInput = card.querySelector('textarea[name^="definition_"]');
-
-            const term = termInput.value.trim();
-            const definition = definitionInput.value.trim();
-
-            cardsData.push({
-                term: term,
-                definition: definition
-            });
-        });
-
-        // Заполняем скрытую форму и отправляем
-        document.getElementById('cardSetNameInput').value = cardSetName;
-
-        const form = document.getElementById('cardSetForm');
-        // Очищаем старые данные
-        while (form.children.length > 2) {  // Оставляем только csrf и cardSetNameInput
-            form.removeChild(form.lastChild);
-        }
-
-        // Добавляем данные карточек напрямую в форму
-        cardsData.forEach((card, index) => {
-            const termInput = document.createElement('input');
-            termInput.type = 'hidden';
-            termInput.name = `term_${index}`;
-            termInput.value = card.term;
-            form.appendChild(termInput);
-
-            const definitionInput = document.createElement('input');
-            definitionInput.type = 'hidden';
-            definitionInput.name = `definition_${index}`;
-            definitionInput.value = card.definition;
-            form.appendChild(definitionInput);
-        });
-
-        // Скрываем модальное окно
-        hideSaveModal();
-
-        // Отправляем форму
-        form.submit();
-    }
-</script>
 
 {% endblock %}
