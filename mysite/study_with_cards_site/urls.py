@@ -22,10 +22,11 @@ from . import views
 
 urlpatterns = [
     path('', views.home_view, name='home'),
+    path('cards/delete/<int:cardset_id>/', views.delete_cardset, name='delete_cardset'),
     path('signin/', views.signin_view, name='sign_in'),
     path('signup/', views.signup_view, name='sign_up'),
     path('cards_creation/', views.cards_creation_view, name='cards_creation'),
-    path('cards_study/', views.cards_study_view, name='cards_study'),
+    path('cards_study/<int:cardset_id>/', views.cards_study_view, name='cards_study'),
     path('stats/', views.stats_view, name='stats'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('create_card_set', views.create_card_set, name='create_card_set')
