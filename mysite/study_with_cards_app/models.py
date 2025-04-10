@@ -2,7 +2,6 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 import uuid
-import random
 
 def user_avatar_path(instance, filename):
     ext = filename.split('.')[-1]
@@ -23,20 +22,13 @@ class User(AbstractUser):
 
 
 class CardSet(models.Model):
-    COLORS = ['#7F56DA', '#22C55E', '#EA580C']
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=50)
     created_at = models.DateTimeField(auto_now_add=True)
-    bg_color = models.CharField(max_length=7, default=COLORS[0])
-
-    def save(self, *args, **kwargs):
-        if not self.bg_color:
-            self.bg_color = random.choice(self.COLORS)
-        super().save(*args, **kwargs)
 
 
 class Card(models.Model):
     card_set = models.ForeignKey(CardSet, on_delete=models.CASCADE)
-    term = models.TextField()
-    definition = models.TextField()
+    term = models.CharField(max_length=50)
+    definition = models.CharField(max_length=150)
     created_at = models.DateTimeField(auto_now_add=True)
