@@ -46,8 +46,18 @@
 <!-- Всплывающее окно для ввода названия набора карточек -->
 <div class="modal-overlay" id="modalOverlay">
     <div class="name-input-modal">
-        <div class="modal-title">НАЗВАНИЕ НАБОРА</div>
-        <input type="text" class="modal-input" id="setNameInput" placeholder="введите название" autocomplete="off">
+        <div class="modal-title-container">
+            <div class="modal-title">НАЗВАНИЕ НАБОРА</div>
+            <div class="modal-char-counter">0/50</div>
+        </div>
+        <input
+                type="text"
+                class="modal-input"
+                id="setNameInput"
+                placeholder="введите название"
+                maxlength="50"
+                autocomplete="off"
+        >
         <div class="modal-buttons">
             <button class="modal-btn cancel-btn" id="cancelSaveBtn">ОТМЕНА</button>
             <button class="modal-btn save-btn" id="confirmSaveBtn">СОХРАНИТЬ</button>
@@ -156,7 +166,7 @@
         opacity: 0;
         transform: translateY(20px);
         animation: fadeIn 0.3s forwards;
-        height: 100px;
+        height: 135px;
     }
 
     .card.invalid {
@@ -177,18 +187,31 @@
         align-self: center;
     }
 
+    .side-title-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .side-title {
+        font-weight: bold;
+        font-size: 16px;
+        text-align: left;
+    }
+
+    .char-counter {
+        font-size: 1em;
+        color: #666;
+        font-weight: normal;
+        margin-left: 10px;
+    }
+
     .card-side {
         flex: 1;
         padding: 5px;
         display: flex;
         flex-direction: column;
-    }
-
-    .side-title {
-        font-weight: bold;
-        margin-bottom: 10px;
-        text-align: left;
-        font-size: 16px;
     }
 
     .card-input {
@@ -340,11 +363,21 @@
         transform: translateY(0);
     }
 
+    .modal-title-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
     .modal-title {
         font-weight: bold;
         font-size: 18px;
-        text-align: center;
-        margin-bottom: 20px;
+    }
+
+    .modal-char-counter {
+        font-size: 0.9em;
+        color: #666;
     }
 
     .modal-input {
@@ -413,6 +446,13 @@
         // Обработчик для кнопки сохранения в всплывающем окне для ввода названия набора карточек
         document.getElementById('confirmSaveBtn').addEventListener('click', saveCardSet);
 
+        // Обработчик для поля ввода названия набора
+        const nameInput = document.getElementById('setNameInput');
+        nameInput.addEventListener('input', function() {
+            document.querySelector('.modal-char-counter').textContent =
+                `${this.value.length}/50`;
+        });
+
         // Обработчик для выпадающего меню пользователя
         document.getElementById('userDropdown').addEventListener('click', function() {
             document.getElementById('dropdownMenu').classList.toggle('show');
@@ -441,8 +481,11 @@
         }
 
         const modal = document.getElementById('modalOverlay');
+        const nameInput = document.getElementById('setNameInput');
+        nameInput.value = '';
+        document.querySelector('.modal-char-counter').textContent = '0/50';
         modal.classList.add('show');
-        document.getElementById('setNameInput').focus();
+        nameInput.focus();
     }
 
     function hideSaveModal() {
@@ -458,20 +501,53 @@
         cardDiv.className = 'card';
         cardDiv.innerHTML = `
             <div class="card-side">
-                <div class="side-title">ПЕРЕДНЯЯ СТОРОНА</div>
-                <textarea class="card-input" name="term_${cardCount}" placeholder="Введите термин"></textarea>
+                <div class="side-title-container">
+                    <div class="side-title">ПЕРЕДНЯЯ СТОРОНА</div>
+                    <div class="char-counter">0/50</div>
+                </div>
+                <textarea
+                    class="card-input"
+                    name="term_${cardCount}"
+                    placeholder="Поле для ввода"
+                    maxlength="50"
+                ></textarea>
                 <div class="input-underline"></div>
             </div>
             <div class="card-divider"></div>
             <div class="card-side">
-                <div class="side-title">ЗАДНЯЯ СТОРОНА</div>
-                <textarea class="card-input" name="definition_${cardCount}" placeholder="Введите определение"></textarea>
+                <div class="side-title-container">
+                    <div class="side-title">ЗАДНЯЯ СТОРОНА</div>
+                    <div class="char-counter">0/150</div>
+                </div>
+                <textarea
+                    class="card-input"
+                    name="definition_${cardCount}"
+                    placeholder="Поле для ввода"
+                    maxlength="150"
+                ></textarea>
                 <div class="input-underline"></div>
             </div>
             <button class="delete-card-btn" onclick="deleteCard(this)"></button>
         `;
 
         container.appendChild(cardDiv);
+
+        // Обработчики для счетчика символов
+        const termInput = cardDiv.querySelector('textarea[name^="term_"]');
+        const termCounter = cardDiv.querySelector('.card-side:nth-child(1) .char-counter');
+
+        const defInput = cardDiv.querySelector('textarea[name^="definition_"]');
+        const defCounter = cardDiv.querySelector('.card-side:nth-child(3) .char-counter');
+
+        termInput.addEventListener('input', function() {
+            termCounter.textContent = `${this.value.length}/50`;
+            this.closest('.card').classList.remove('invalid');
+        });
+
+        defInput.addEventListener('input', function() {
+            defCounter.textContent = `${this.value.length}/150`;
+            this.closest('.card').classList.remove('invalid');
+        });
 
         // Обработчики для снятия выделения при вводе
         const inputs = cardDiv.querySelectorAll('.card-input');
