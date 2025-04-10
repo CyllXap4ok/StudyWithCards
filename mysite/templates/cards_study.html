@@ -1,10 +1,250 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base_page.html' %}
 
-</body>
-</html>
+{% block content %}
+<div class="study-container">
+    <h1 class="cardset-title">{{ cardset.name }}</h1>
+
+    <div class="card-container">
+        <div class="card" id="card" onclick="flipCard()">
+            <div class="card-face card-front">
+                <div class="card-header">
+                    <div class="card-side-label">ПЕРЕДНЯЯ СТОРОНА</div>
+                    <div class="flip-indicator">↻</div>
+                </div>
+                <div class="card-content" id="front-content">{{ cards.0.term }}</div>
+            </div>
+            <div class="card-face card-back">
+                <div class="card-header">
+                    <div class="card-side-label">ЗАДНЯЯ СТОРОНА</div>
+                    <div class="flip-indicator">↻</div>
+                </div>
+                <div class="card-content" id="back-content">{{ cards.0.definition }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-button nav-prev" id="prev-btn" disabled onclick="prevCard()">←</button>
+        <button class="nav-button nav-next" id="next-btn" {% if cards|length == 1 %}disabled{% endif %} onclick="nextCard()">→</button>
+    </div>
+</div>
+
+<script>
+    let currentCardIndex = 0;
+    const cards = [
+        {% for card in cards %}
+            { term: "{{ card.term|escapejs }}", definition: "{{ card.definition|escapejs }}" },
+        {% endfor %}
+    ];
+
+    function flipCard() {
+        document.getElementById('card').classList.toggle('flipped');
+    }
+
+    function updateCard() {
+        const card = document.getElementById('card');
+        const frontContent = document.getElementById('front-content');
+        const backContent = document.getElementById('back-content');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+
+        // Установка front-side для карточки
+        if (card.classList.contains('flipped')) {
+            card.classList.remove('flipped');
+        }
+
+        // Обновление термина и определения
+        frontContent.textContent = cards[currentCardIndex].term;
+        backContent.textContent = cards[currentCardIndex].definition;
+
+        // Обновление кнопок переключения между карточками
+        prevBtn.disabled = currentCardIndex === 0;
+        nextBtn.disabled = currentCardIndex === cards.length - 1;
+    }
+
+    function nextCard() {
+        if (currentCardIndex < cards.length - 1) {
+            currentCardIndex++;
+            animateCard('right');
+            updateCard();
+        }
+    }
+
+    function prevCard() {
+        if (currentCardIndex > 0) {
+            currentCardIndex--;
+            animateCard('left');
+            updateCard();
+        }
+    }
+
+    function animateCard(direction) {
+        const cardContainer = document.querySelector('.card-container');
+        const card = document.getElementById('card');
+
+        // Create animation class
+        cardContainer.classList.add(`slide-${direction}`);
+
+        // Remove animation class after animation completes
+        setTimeout(() => {
+            cardContainer.classList.remove(`slide-${direction}`);
+        }, 500);
+    }
+</script>
+
+<style>
+    .study-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        max-width: 800px;
+        margin: 20px auto;
+    }
+
+    .cardset-title {
+        color: white;
+        font-size: 24px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .card-container {
+        perspective: 1000px;
+        width: 500px;
+        height: 300px;
+        position: relative;
+        margin-bottom: 30px;
+    }
+
+    .card-container.slide-right {
+        animation: slideRight 0.5s ease-in-out;
+    }
+
+    .card-container.slide-left {
+        animation: slideLeft 0.5s ease-in-out;
+    }
+
+    @keyframes slideRight {
+        0% { transform: translateX(0); opacity: 1; }
+        50% { transform: translateX(100%); opacity: 0; }
+        51% { transform: translateX(-100%); opacity: 0; }
+        100% { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes slideLeft {
+        0% { transform: translateX(0); opacity: 1; }
+        50% { transform: translateX(-100%); opacity: 0; }
+        51% { transform: translateX(100%); opacity: 0; }
+        100% { transform: translateX(0); opacity: 1; }
+    }
+
+    .card {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transform-style: preserve-3d;
+        transition: transform 0.6s;
+        cursor: pointer;
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .card.flipped {
+        transform: rotateY(180deg);
+    }
+
+    .card-face {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        border-radius: 15px;
+        background: white;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .card-front {
+        transform: rotateY(0deg);
+    }
+
+    .card-back {
+        transform: rotateY(180deg);
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        margin-bottom: 10px;
+    }
+
+    .card-side-label {
+        text-align: center;
+        font-size: 18px;
+        color: #666;
+    }
+
+    .card-content {
+        flex-grow: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 26px;
+        text-align: center;
+        word-break: break-word;
+        overflow: auto;
+    }
+
+    .flip-indicator {
+        position: absolute;
+        right: 0;
+        color: #666;
+        font-size: 22px;
+    }
+
+    .navigation {
+        display: flex;
+        justify-content: space-between;
+        width: 500px;
+    }
+
+    .nav-button {
+        background: rgba(255, 255, 255, 0.3);
+        border: none;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 24px;
+        color: white;
+        transition: background 0.3s;
+    }
+
+    .nav-button:hover {
+        background: rgba(255, 255, 255, 0.5);
+    }
+
+    .nav-button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        display: none;
+    }
+
+    .nav-prev {
+        margin-right: auto;
+    }
+
+    .nav-next {
+        margin-left: auto;
+    }
+</style>
+{% endblock %}
