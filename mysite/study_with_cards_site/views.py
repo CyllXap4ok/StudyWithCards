@@ -57,17 +57,9 @@ def stats_view(request):
 
 @login_required(login_url='sign_in')
 def delete_cardset(request, cardset_id):
-    if not request.user.is_authenticated:
-        return JsonResponse({'success': False, 'error': 'Требуется авторизация'})
-
-    try:
-        cardset = CardSet.objects.get(id=cardset_id, user=request.user)
-        cardset.delete()
-        return JsonResponse({'success': True})
-    except CardSet.DoesNotExist:
-        return JsonResponse({'success': False, 'error': 'Набор карточек не найден'})
-    except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)})
+    cardset = get_object_or_404(CardSet, id=cardset_id, user=request.user)
+    cardset.delete()
+    return redirect('home')
 
 @login_required(login_url='sign_in')
 @require_POST

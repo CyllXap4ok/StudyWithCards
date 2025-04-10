@@ -44,7 +44,6 @@
         <button class="delete-card-btn" data-cardset-id="{{ cardset.id }}"></button>
     </div>
     {% empty %}
-    <div class="no-cardsets">У вас пока нет наборов карточек</div>
     {% endfor %}
 </div>
 
@@ -363,23 +362,21 @@
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': '{{ csrf_token }}',
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/x-www-form-urlencoded',
                 },
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Плавное удаление элемента
-                    currentCardsetElement.style.transition = 'all 0.3s ease';
-                    currentCardsetElement.style.opacity = '0';
-                    currentCardsetElement.style.height = '0';
-                    currentCardsetElement.style.margin = '0';
-                    currentCardsetElement.style.padding = '0';
-
-                    setTimeout(() => {
-                        currentCardsetElement.remove();
-                    }, 300);
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
                 } else {
+                    return response.json();
+                }
+            })
+            .then(data => {
+                if (data && data.success) {
+                    // Полное удаление элемента и перезагрузка страницы
+                    window.location.reload();
+                } else if (data) {
                     alert('Ошибка при удалении: ' + (data.error || 'Неизвестная ошибка'));
                 }
                 closeModal();
