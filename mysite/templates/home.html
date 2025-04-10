@@ -1,38 +1,6 @@
 {% extends 'base_page.html' %}
-{% load static %}
 
 {% block content %}
-<div class="header">
-    <div class="site-title">Study With Cards</div>
-
-    <div class="user-container" id="userDropdown">
-
-        <div class="user-info">
-            <div>{{ user.name }}</div>
-            <div style="font-size: 0.8em;">{{ user.email }}</div>
-        </div>
-
-        <div class="user-icon" style="background-image: url(
-            {% if user.avatar %}
-                {{ user.avatar.url }}
-            {% else %}
-                {% static 'images/user-icon.png' %}
-            {% endif %});">
-        </div>
-
-        <div class="dropdown-menu" id="dropdownMenu">
-            <a href="{% url 'stats' %}" class="dropdown-item">Статистика</a>
-            <a href="#" class="dropdown-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Выход</a>
-            <form id="logout-form" method="post" action="{% url 'logout' %}" style="display: none;">
-                {% csrf_token %}
-            </form>
-        </div>
-
-    </div>
-</div>
-
-<div class="divider"></div>
-
 <!-- Grid с наборами карточек -->
 <div class="cardsets-grid">
     {% for cardset in user.cardset_set.all %}
@@ -62,74 +30,6 @@
 <a href="{% url 'cards_creation' %}" class="add-button"></a>
 
 <style>
-    .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 20px;
-    }
-
-    .site-title {
-        color: white;
-        font-size: 32px;
-        font-weight: bold;
-    }
-
-    .user-container {
-        display: flex;
-        align-items: center;
-        position: relative;
-        cursor: pointer;
-    }
-
-    .dropdown-menu {
-        position: absolute;
-        top: 100%;
-        right: 0;
-        margin: 5px;
-        background-color: rgba(255, 255, 255, 0.5);
-        border: 1px solid white;
-        border-radius: 5px;
-        padding: 10px 0;
-        min-width: 150px;
-        display: none;
-        z-index: 1000;
-    }
-
-    .dropdown-menu.show {
-        display: block;
-    }
-
-    .dropdown-item {
-        color: black;
-        padding: 8px 15px;
-        text-decoration: none;
-        display: block;
-    }
-
-    .dropdown-item:hover {
-        background-color: white;
-    }
-
-    .user-info {
-        color: white;
-        text-align: right;
-        margin-right: 20px;
-    }
-
-    .user-icon {
-        width: 50px;
-        height: 50px;
-        border: 1px solid white;
-        border-radius: 50%;
-        background-size: cover;
-        background-position: center;
-    }
-
-    .divider {
-        border-top: 2px solid white;
-    }
-
     .cardsets-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -306,17 +206,6 @@
 </style>
 
 <script>
-    document.getElementById('userDropdown').addEventListener('click', function() {
-        document.getElementById('dropdownMenu').classList.toggle('show');
-    });
-
-    // Закрытие меню при клике вне его
-    window.addEventListener('click', function(event) {
-        if (!event.target.closest('#userDropdown')) {
-            document.getElementById('dropdownMenu').classList.remove('show');
-        }
-    });
-
     document.addEventListener('DOMContentLoaded', function() {
         const deleteButtons = document.querySelectorAll('.delete-card-btn');
         const modal = document.getElementById('deleteModal');
@@ -346,7 +235,7 @@
 
         cancelBtn.addEventListener('click', closeModal);
 
-        // Закрытие при клике вне модального окна
+        // Закрытие при клике вне всплывающего окна
         modal.addEventListener('click', function(e) {
             if (e.target === modal) {
                 closeModal();

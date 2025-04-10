@@ -1,36 +1,6 @@
 {% extends 'base_page.html' %}
 
-{% load static %}
-
 {% block content %}
-<div class="header">
-    <div class="site-title">Study With Cards</div>
-
-    <div class="user-container" id="userDropdown">
-        <div class="user-info">
-            <div>{{ user.name }}</div>
-            <div style="font-size: 0.8em;">{{ user.email }}</div>
-        </div>
-
-        <div class="user-icon" style="background-image: url(
-            {% if user.avatar %}
-                {{ user.avatar.url }}
-            {% else %}
-                {% static 'images/user-icon.png' %}
-            {% endif %});">
-        </div>
-
-        <div class="dropdown-menu" id="dropdownMenu">
-            <a href="{% url 'stats' %}" class="dropdown-item">Статистика</a>
-            <a href="#" class="dropdown-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Выход</a>
-            <form id="logout-form" method="post" action="{% url 'logout' %}" style="display: none;">
-                {% csrf_token %}
-            </form>
-        </div>
-    </div>
-</div>
-<div class="divider"></div>
-
 <div class="container">
     <div class="cards-container" id="cardsContainer">
         <!-- СПИСОК КАРТОЧЕК -->
@@ -202,6 +172,7 @@
 
     .char-counter {
         font-size: 1em;
+        font-family: sans-serif;
         color: #666;
         font-weight: normal;
         margin-left: 10px;
@@ -453,20 +424,7 @@
                 `${this.value.length}/50`;
         });
 
-        // Обработчик для выпадающего меню пользователя
-        document.getElementById('userDropdown').addEventListener('click', function() {
-            document.getElementById('dropdownMenu').classList.toggle('show');
-        });
-
         window.addEventListener('click', function(event) {
-            // Закрываем выпадающее меню при клике вне его
-            if (!event.target.matches('#userDropdown') && !event.target.closest('#userDropdown')) {
-                const dropdown = document.getElementById('dropdownMenu');
-                if (dropdown.classList.contains('show')) {
-                    dropdown.classList.remove('show');
-                }
-            }
-
             // Закрываем всплывающее окно при клике вне его
             if (event.target.matches('.modal-overlay')) {
                 hideSaveModal();

@@ -1,42 +1,45 @@
-{% extends "base_page.html" %}
-
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@400;500&family=Arial+Black&display=swap" rel="stylesheet">
+</head>
 {% block content %}
-<div class="login-container">
-    {% if form.errors %}
-    <div class="errorlist">
-        {% for error in form.non_field_errors %}
-            <p>{{ error }}</p>
-        {% endfor %}
+<body>
+    <div class="login-container">
+        {% if form.errors %}
+        <div class="errorlist">
+            {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-fields">
+                <div class="input-group">
+                    {{ form.username.label_tag }}
+                    <div class="input-field">
+                        {{ form.username }}
+                    </div>
+                    {{ form.username.errors }}
+                </div>
+
+                <div class="input-group">
+                    {{ form.password.label_tag }}
+                    <div class="input-field">
+                        {{ form.password }}
+                    </div>
+                    {{ form.password.errors }}
+                </div>
+            </div>
+
+            <div class="form-footer">
+                <button type="submit" class="signin-btn">Sign In</button>
+                <p class="signup-link">Don't have an account? <a href="{% url 'sign_up' %}">Sign up</a></p>
+            </div>
+        </form>
     </div>
-    {% endif %}
-
-    <form method="post">
-        {% csrf_token %}
-
-        <div class="form-fields">
-            <div class="input-group">
-                {{ form.username.label_tag }}
-                <div class="input-field">
-                    {{ form.username }}
-                </div>
-                {{ form.username.errors }}
-            </div>
-
-            <div class="input-group">
-                {{ form.password.label_tag }}
-                <div class="input-field">
-                    {{ form.password }}
-                </div>
-                {{ form.password.errors }}
-            </div>
-        </div>
-
-        <div class="form-footer">
-            <button type="submit" class="signin-btn">Sign In</button>
-            <p class="signup-link">Don't have an account? <a href="{% url 'sign_up' %}">Sign up</a></p>
-        </div>
-    </form>
-</div>
+</body>
 
 <style>
     body {
@@ -47,6 +50,7 @@
         margin: 0;
         padding: 20px;
         box-sizing: border-box;
+        font-family: 'Alegreya Sans', sans-serif;
         background: linear-gradient(to bottom, #6ec0ac, #ca9aff);
     }
 
@@ -74,8 +78,7 @@
         display: block;
         margin-bottom: 8px;
         color: #000;
-        font-size: 16px;
-        font-weight: 500;
+        font-size: 20px;
     }
 
     .input-field {

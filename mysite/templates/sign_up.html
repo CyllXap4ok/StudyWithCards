@@ -1,58 +1,61 @@
-{% extends "base_page.html" %}
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@400;500&family=Arial+Black&display=swap" rel="stylesheet">
+</head>
 
 {% load static %}
 
 {% block content %}
-<div class="login-container">
+<body>
+    <div class="login-container">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
 
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-
-        <div class="user-icon-container" onclick="document.getElementById('id_avatar').click()">
-            <div class="user-icon" id="user-icon-preview"
-                 style="background-image: url('{% static 'images/user-icon.png' %}')"></div>
-            {{ form.avatar }}
-        </div>
-
-        <div class="form-fields">
-            <div class="input-group">
-                {{ form.email.label_tag }}
-                <div class="input-field">
-                    {{ form.email }}
-                </div>
-                {{ form.email.errors }}
+            <div class="user-icon-container" onclick="document.getElementById('id_avatar').click()">
+                <div class="user-icon" id="user-icon-preview"
+                     style="background-image: url('{% static 'images/user-icon.png' %}')"></div>
+                {{ form.avatar }}
             </div>
 
-            <div class="input-group">
-                {{ form.name.label_tag }}
-                <div class="input-field">
-                    {{ form.name }}
+            <div class="form-fields">
+                <div class="input-group">
+                    {{ form.email.label_tag }}
+                    <div class="input-field">
+                        {{ form.email }}
+                    </div>
+                    {{ form.email.errors }}
                 </div>
-                {{ form.name.errors }}
+
+                <div class="input-group">
+                    {{ form.name.label_tag }}
+                    <div class="input-field">
+                        {{ form.name }}
+                    </div>
+                    {{ form.name.errors }}
+                </div>
+
+                <div class="input-group">
+                    {{ form.password1.label_tag }}
+                    <div class="input-field">
+                        {{ form.password1 }}
+                    </div>
+                    {{ form.password1.errors }}
+                </div>
+
+                <div class="input-group">
+                    {{ form.password2.label_tag }}
+                    <div class="input-field">
+                        {{ form.password2 }}
+                    </div>
+                    {{ form.password2.errors }}
+                </div>
             </div>
 
-            <div class="input-group">
-                {{ form.password1.label_tag }}
-                <div class="input-field">
-                    {{ form.password1 }}
-                </div>
-                {{ form.password1.errors }}
+            <div class="form-footer">
+                <button type="submit" class="signup-btn">Sign Up</button>
             </div>
-
-            <div class="input-group">
-                {{ form.password2.label_tag }}
-                <div class="input-field">
-                    {{ form.password2 }}
-                </div>
-                {{ form.password2.errors }}
-            </div>
-        </div>
-
-        <div class="form-footer">
-            <button type="submit" class="signup-btn">Sign Up</button>
-        </div>
-    </form>
-</div>
+        </form>
+    </div>
+</body>
 
 <style>
     body {
@@ -63,6 +66,7 @@
         margin: 0;
         padding: 20px;
         box-sizing: border-box;
+        font-family: 'Alegreya Sans', sans-serif;
         background: linear-gradient(to bottom, #6ec0ac, #ca9aff);
     }
 

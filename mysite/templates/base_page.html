@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+{% load static %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token }}">
-    <title>{% block title %}My Site{% endblock %}</title>
+    <title>{% block title %}Study With Cards{% endblock %}</title>
     <link href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@400;500&family=Arial+Black&display=swap" rel="stylesheet">
     <style>
         body {
             margin: 0;
             padding: 0;
-            font-family: sans-serif;
+            font-family: 'Alegreya Sans', sans-serif;
             background: linear-gradient(to bottom, #6ec0ac, #ca9aff);
             min-height: 100vh;
         }
@@ -21,10 +22,125 @@
             align-items: center;
             padding: 20px;
         }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .site-title {
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .user-container {
+            display: flex;
+            align-items: center;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin: 5px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border: 1px solid white;
+            border-radius: 5px;
+            padding: 10px 0;
+            min-width: 150px;
+            display: none;
+            z-index: 1000;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            color: black;
+            padding: 8px 15px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-item:hover {
+            background-color: white;
+        }
+
+        .user-info {
+            color: white;
+            text-align: right;
+            margin-right: 20px;
+        }
+
+        .user-icon {
+            width: 50px;
+            height: 50px;
+            border: 1px solid white;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .divider {
+            border-top: 2px solid white;
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
+
 <body>
+
+    <div class="header">
+        <a class="site-title" href="{% url 'home' %}">Study With Cards</a>
+
+        <div class="user-container" id="userDropdown">
+
+            <div class="user-info">
+                <div>{{ user.name }}</div>
+                <div style="font-size: 0.8em;">{{ user.email }}</div>
+            </div>
+
+            <div class="user-icon" style="background-image: url(
+                {% if user.avatar %}
+                    {{ user.avatar.url }}
+                {% else %}
+                    {% static 'images/user-icon.png' %}
+                {% endif %});">
+            </div>
+
+            <div class="dropdown-menu" id="dropdownMenu">
+                <a href="{% url 'stats' %}" class="dropdown-item">Статистика</a>
+                <a href="#" class="dropdown-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Выход</a>
+                <form id="logout-form" method="post" action="{% url 'logout' %}" style="display: none;">
+                    {% csrf_token %}
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <script>
+        document.getElementById('userDropdown').addEventListener('click', function() {
+            document.getElementById('dropdownMenu').classList.toggle('show');
+        });
+
+        // Закрытие меню при клике вне его
+        window.addEventListener('click', function(event) {
+            if (!event.target.closest('#userDropdown')) {
+                document.getElementById('dropdownMenu').classList.remove('show');
+            }
+        });
+    </script>
+
     {% block content %}{% endblock %}
 
     {% block extra_js %}{% endblock %}
