@@ -26,6 +26,7 @@ urlpatterns = [
     path('signin/', views.signin_view, name='sign_in'),
     path('signup/', views.signup_view, name='sign_up'),
     path('cards_creation/', views.cards_creation_view, name='cards_creation'),
+    path('api/get_card_html/', views.get_card_html, name='get_card_html'),
     path('cards_study/<int:cardset_id>/', views.cards_study_view, name='cards_study'),
     path('stats/', views.stats_view, name='stats'),
     path('logout/', LogoutView.as_view(), name='logout'),

@@ -1,6 +1,9 @@
 <head>
     <link href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@400;500&family=Arial+Black&display=swap" rel="stylesheet">
 </head>
+
+{% load static %}
+
 {% block content %}
 <body>
     <div class="login-container">
@@ -41,140 +44,7 @@
     </div>
 </body>
 
-<script>
-    document.querySelectorAll('.input-field input').forEach(input => {
-        // Устанавливаем черную границу при наличии значения
-        if (input.value) {
-            input.style.borderBottomColor = '#000';
-        }
-
-        input.addEventListener('focus', function() {
-            this.style.borderBottomColor = '#000';
-        });
-
-        input.addEventListener('blur', function() {
-            if (!this.value) {
-                this.style.borderBottomColor = '#ccc';
-            }
-        });
-    });
-</script>
-
-<style>
-    body {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        margin: 0;
-        padding: 20px;
-        box-sizing: border-box;
-        font-family: 'Alegreya Sans', sans-serif;
-        background: linear-gradient(to bottom, #6ec0ac, #ca9aff);
-    }
-
-    .login-container {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        width: 350px;
-        padding: 40px;
-        position: relative;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .form-fields {
-        margin-bottom: 20px;
-    }
-
-    .input-group {
-        margin-bottom: 25px;
-        text-align: left;
-    }
-
-    .input-group label {
-        display: block;
-        margin-bottom: 8px;
-        color: #000;
-        font-size: 20px;
-    }
-
-    .input-field {
-        position: relative;
-    }
-
-    .input-field input {
-        width: 100%;
-        padding: 10px 0;
-        border: none;
-        border-bottom: 1px solid #ccc;
-        background: transparent;
-        outline: none;
-        font-family: 'Alegreya Sans', sans-serif;
-        font-size: 16px;
-    }
-
-    .input-field input:focus {
-        border-bottom: 1px solid #000;
-    }
-
-    .form-footer {
-        margin-top: auto;
-        padding-top: 20px;
-    }
-
-    .signin-btn {
-        background: #4361ee;
-        color: white;
-        border: none;
-        border-radius: 25px;
-        padding: 12px;
-        font-family: 'Arial Black', sans-serif;
-        font-size: 16px;
-        cursor: pointer;
-        width: 100%;
-        transition: background 0.3s;
-        margin-bottom: 10px;
-    }
-
-    .signin-btn:hover {
-        background: #3a56d4;
-    }
-
-    .signup-link {
-        text-align: center;
-        margin-top: 15px;
-        color: #555;
-        font-size: 14px;
-    }
-
-    .signup-link a {
-        color: #4361ee;
-        text-decoration: none;
-        font-weight: 500;
-    }
-
-    .signup-link a:hover {
-        text-decoration: underline;
-    }
-
-    .create-account {
-        display: block;
-        color: #4361ee;
-        text-decoration: none;
-        font-size: 14px;
-        text-align: center;
-        margin-top: 5px;
-    }
-
-    .errorlist {
-        color: red;
-        font-size: 14px;
-        list-style: none;
-        padding: 0;
-        margin: 5px 0 0;
-    }
-</style>
-
+<!-- СSS И JavaScript -->
+<link rel="stylesheet" href="{% static 'css/sign_in.css' %}">
+<script src="{% static 'js/sign_in.js' %}"></script>
 {% endblock %}

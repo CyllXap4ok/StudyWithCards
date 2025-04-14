@@ -12,7 +12,9 @@
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.template.loader import render_to_string
 from django.views.decorators.http import require_POST
 from study_with_cards_app.models import CardSet, Card
 from .forms import UserSignInForm, UserSignUpForm
@@ -95,6 +97,12 @@ def cards_creation_view(request):
     return render(request, 'cards_creation.html')
 
 
+def get_card_html(request):
+    """Функция, предоставляющая шаблон карточки (для JS)"""
+    html = render_to_string('inner_templates/card.html')
+    return HttpResponse(html)
+
+
 @login_required(login_url='sign_in')
 def cards_study_view(request, cardset_id):
     """Страница изучения карточек из конкретного набора.
@@ -166,6 +174,8 @@ def create_card_set(request):
     if request.method == 'POST':
         card_set_name = request.POST.get('card_set_name', 'Новый набор')
 
+        if not card_set_name: return redirect('cards_creation')
+
         card_set = CardSet.objects.create(
             user=request.user,
             name=card_set_name
@@ -178,6 +188,7 @@ def create_card_set(request):
 
         # Создаем карточки, объединяя термины и определения
         for term, definition in zip(terms, definitions):
+            if term is None or definition is None: break
             Card.objects.create(
                 card_set=card_set,
                 term=term[0],

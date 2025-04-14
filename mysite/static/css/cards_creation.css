@@ -1,0 +1,51 @@
+.container {
+    padding: 10px 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    min-height: calc(100vh - 150px);
+    padding-bottom: 20px;
+}
+.cards-container {
+    margin-bottom: 20px;
+    padding: 10px;
+}
+.add-card-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s;
+    padding: 0;
+}
+.add-card-btn::after {
+    content: "+";
+    font-size: 24px;
+    line-height: 1;
+}
+.add-card-btn:hover {
+    transform: scale(1.1);
+}
+.save-set-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(to right, #1a7b45, #6b1ed3);
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+}
+.save-set-btn:hover {
+    opacity: 1;
+}

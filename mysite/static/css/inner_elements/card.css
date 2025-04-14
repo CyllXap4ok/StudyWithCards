@@ -1,0 +1,129 @@
+.card {
+    position: relative;
+    background: white;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeIn 0.3s forwards;
+    height: 135px;
+}
+
+.card.invalid {
+    border-color: #ff4444;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card-divider {
+    border-left: 1px solid #ccc;
+    margin: 0 15px;
+    height: 100%;
+    align-self: center;
+}
+
+.side-title-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.side-title {
+    font-weight: bold;
+    font-size: 16px;
+    text-align: left;
+}
+
+.char-counter {
+    font-size: 1em;
+    font-family: sans-serif;
+    color: #666;
+    font-weight: normal;
+    margin-left: 10px;
+}
+
+.card-side {
+    flex: 1;
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-input {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 16px;
+    min-height: 80px;
+    resize: none;
+    flex-grow: 1;
+}
+
+.add-card-container {
+    display: flex;
+    justify-content: center;
+    margin: 15px 0;
+}
+
+.delete-card-btn {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: rgba(255, 0, 0, 0.7);
+    border: none;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s, background-color 0.2s;
+    z-index: 10;
+}
+
+.delete-card-btn:hover {
+    background-color: rgba(255, 0, 0, 1);
+}
+
+.delete-card-btn::after {
+    content: "×";
+    line-height: 1;
+}
+
+.card:hover .delete-card-btn {
+    opacity: 1;
+}
+
+@keyframes slideOut {
+    0% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(-100px);
+        opacity: 0;
+        height: 0;
+        margin-bottom: 0;
+        padding: 0;
+    }
+}
+
+.card-deleting {
+    animation: slideOut 0.3s forwards;
+}

@@ -1,0 +1,83 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Alegreya Sans', sans-serif;
+    background: linear-gradient(to bottom, #6ec0ac, #ca9aff);
+    min-height: 100vh;
+}
+
+.content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+}
+
+.site-title {
+    color: white;
+    font-size: 32px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.user-container {
+    display: flex;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin: 5px;
+    background-color: rgba(255, 255, 255, 0.5);
+    border: 1px solid white;
+    border-radius: 5px;
+    padding: 10px 0;
+    min-width: 150px;
+    display: none;
+    z-index: 1000;
+}
+
+.dropdown-menu.show {
+    display: block;
+}
+
+.dropdown-item {
+    color: black;
+    padding: 8px 15px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-item:hover {
+    background-color: white;
+}
+
+.user-info {
+    color: white;
+    text-align: right;
+    margin-right: 20px;
+}
+
+.user-icon {
+    width: 50px;
+    height: 50px;
+    border: 1px solid white;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+}
+
+.divider {
+    border-top: 2px solid white;
+}

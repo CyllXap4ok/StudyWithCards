@@ -37,11 +37,9 @@ class CardSet(models.Model):
     Args:
         user - связанный с набором пользователь
         name - название набора карточек
-        created_at - точное время создания набора
     """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
-    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class Card(models.Model):
@@ -51,9 +49,7 @@ class Card(models.Model):
         card_set - связанный с карточкой набор
         term - термин (выводится на передней стороне)
         definition - определение (выводится на оборотной стороне)
-        created_at - точное время создания набора
     """
     card_set = models.ForeignKey(CardSet, on_delete=models.CASCADE)
     term = models.CharField(max_length=50)
     definition = models.CharField(max_length=150)
-    created_at = models.DateTimeField(auto_now_add=True)

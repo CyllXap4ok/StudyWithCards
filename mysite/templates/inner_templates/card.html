@@ -1,0 +1,30 @@
+<div class="card">
+    <div class="card-side">
+        <div class="side-title-container">
+            <div class="side-title">ПЕРЕДНЯЯ СТОРОНА</div>
+            <div class="char-counter">0/50</div>
+        </div>
+        <textarea
+            class="card-input"
+            name="term_${cardCount}"
+            placeholder="Поле для ввода"
+            maxlength="50"
+        ></textarea>
+        <div class="input-underline"></div>
+    </div>
+    <div class="card-divider"></div>
+    <div class="card-side">
+        <div class="side-title-container">
+            <div class="side-title">ЗАДНЯЯ СТОРОНА</div>
+            <div class="char-counter">0/150</div>
+        </div>
+        <textarea
+            class="card-input"
+            name="definition_${cardCount}"
+            placeholder="Поле для ввода"
+            maxlength="150"
+        ></textarea>
+        <div class="input-underline"></div>
+    </div>
+    <button class="delete-card-btn" onclick="deleteCard(this)"></button>
+</div>
